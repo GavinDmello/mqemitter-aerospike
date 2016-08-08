@@ -1,0 +1,34 @@
+{
+  "name": "mqemitter-aerospike",
+  "version": "0.0.1",
+  "description": "Aerospike based MQEmitter",
+  "main": "mqemitter-aerospike.js",
+  "scripts": {
+    "test": "standard && tape test.js | faucet"
+  },
+  "pre-commit": "test",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/GavinDmello/mqemitter-aerospike"
+  },
+  "author": "GavinDmello",
+  "license": "MIT",
+  "engines": {
+    "node": ">=4.0.0"
+  },
+  "devDependencies": {
+    "faucet": "0.0.1",
+    "mongo-clean": "^1.2.2",
+    "pre-commit": "^1.0.7",
+    "standard": "^7.0.0",
+    "tape": "^4.0.0"
+  },
+  "dependencies": {
+    "aerospike": "^2.2.0",
+    "inherits": "^2.0.1",
+    "mongodb": "^2.2.0",
+    "mqemitter": "^2.0.0",
+    "pump": "^1.0.0",
+    "through2": "^2.0.0"
+  }
+}
