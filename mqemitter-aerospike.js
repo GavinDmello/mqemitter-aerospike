@@ -18,7 +18,12 @@ function MQEmitterAerospike (opts) {
   opts.ns = opts.ns || 'test'
 
   var config = {
-    hosts: opts.hosts
+    hosts: opts.hosts,
+    connTimeoutMs: 3000,
+    policies: {
+      timeout: 10000
+    },
+    tenderInterval: 100
   }
 
   this._opts = opts
@@ -43,6 +48,10 @@ function MQEmitterAerospike (opts) {
   this._started = false
   this.status = new EE()
 
+  this.status.on('closeCalled', function () {
+    that.closedStream = true
+  })
+
   var oldEmit = MQEmitter.prototype.emit
   that._mutex = false
 
@@ -52,6 +61,11 @@ function MQEmitterAerospike (opts) {
   this._lastId = 0
 
   function start () {
+    if (that.closedStream) {
+      that.status.emit('closedAck')
+      return
+    }
+
     var recordsLength = 0
     that._streamData = []
     that._temp = 0
@@ -131,7 +145,7 @@ MQEmitterAerospike.prototype.emit = function (obj, cb) {
       } else {
         if (that._lastId > that._streamedCount) {
           that._waiting[that._lastId] = cb
-        } else {
+        } else if (cb) {
           cb()
         }
       }
@@ -160,10 +174,13 @@ MQEmitterAerospike.prototype.close = function (cb) {
     if (that._opts.db) {
       cb()
     } else {
-      that._db.close(cb)
+      that.status.on('closedAck', function () {
+        that._db.close(false)
+        cb()
+      })
     }
   })
-
+  that.status.emit('closeCalled')
   return this
 }
 
