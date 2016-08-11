@@ -45,7 +45,10 @@ function MQEmitterAerospike (opts) {
       }
     })
   }
+
+  this.closedServer = false
   this._started = false
+  this._emitOnGoing = false
   this.status = new EE()
 
   this.status.on('closeCalled', function () {
@@ -62,6 +65,9 @@ function MQEmitterAerospike (opts) {
 
   function start () {
     if (that.closedStream) {
+      if (that._emitOnGoing) {
+        setTimeout(start, 100)
+      }
       that.status.emit('closedAck')
       return
     }
@@ -102,7 +108,7 @@ function MQEmitterAerospike (opts) {
     })
 
     function process (obj, cb) {
-      if (that.closed) {
+      if (that.closedServer) {
         return cb()
       }
 
@@ -124,13 +130,14 @@ function MQEmitterAerospike (opts) {
 inherits(MQEmitterAerospike, MQEmitter)
 
 MQEmitterAerospike.prototype.emit = function (obj, cb) {
+  this._emitOnGoing = true
   var that = this
   var err
-  if (!this.closed && !this.streamOnce) {
+  if (!this.closedServer && !this.streamOnce) {
     // actively poll if stream is available
     this.status.once('stream', this.emit.bind(this, obj, cb))
     return this
-  } else if (this.closed) {
+  } else if (this.closedServer) {
     err = new Error('MQEmitterAerospike is closed')
     if (cb) {
       cb(err)
@@ -151,13 +158,14 @@ MQEmitterAerospike.prototype.emit = function (obj, cb) {
       }
     })
   }
+  that._emitOnGoing = false
   return this
 }
 
 MQEmitterAerospike.prototype.close = function (cb) {
   cb = cb || noop
 
-  if (this.closed) {
+  if (this.closedServer) {
     return cb()
   }
 
@@ -167,8 +175,6 @@ MQEmitterAerospike.prototype.close = function (cb) {
   }
 
   this._stream = null
-  this.closed = true
-
   var that = this
   MQEmitter.prototype.close.call(this, function () {
     if (that._opts.db) {
@@ -176,7 +182,10 @@ MQEmitterAerospike.prototype.close = function (cb) {
     } else {
       that.status.on('closedAck', function () {
         that._db.close(false)
-        cb()
+        that.closedServer = true
+        if (cb) {
+          cb()
+        }
       })
     }
   })
