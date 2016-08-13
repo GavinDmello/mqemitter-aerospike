@@ -73,7 +73,7 @@ function MQEmitterAerospike (opts) {
     }
 
     var recordsLength = 0
-    that._streamData = []
+    that._streamData = {}
     that._temp = 0
     var statement = {}
     statement.select = ['recordId', 'data']
@@ -83,7 +83,7 @@ function MQEmitterAerospike (opts) {
     that._stream.on('data', function (data) {
       that._temp++
       recordsLength++
-      that._streamData.push(data)
+      that._streamData[data.recordId] = data
       if (that._temp > that._lastId) {
         that._lastId = that._temp
       }
@@ -113,7 +113,7 @@ function MQEmitterAerospike (opts) {
       }
 
       that._started = true
-
+      console.log('++++++++', obj)
       oldEmit.call(that, obj.data, cb)
 
       var id = that._streamedCount.toString()
@@ -145,6 +145,7 @@ MQEmitterAerospike.prototype.emit = function (obj, cb) {
       throw err
     }
   } else {
+    console.log('==============', this._lastId)
     this._db.put(key(this._opts.ns, this._opts.set, this._lastId), { recordId: this._lastId, data: obj }, function (error, key) {
       if (error && error.code !== status.AEROSPIKE_OK) {
         cb(error)
@@ -157,6 +158,7 @@ MQEmitterAerospike.prototype.emit = function (obj, cb) {
         }
       }
     })
+    this._lastId++
   }
   that._emitOnGoing = false
   return this
