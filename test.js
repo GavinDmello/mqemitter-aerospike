@@ -2,9 +2,9 @@
 
 var aerospikeEmitter = require('./mqemitter-aerospike')
 var test = require('tape').test
-var abstractTests = require('mqemitter/abstractTest.js')
+var aerospikeTest = require('./aerospikeTest.js')
 
-abstractTests({
+aerospikeTest({
   builder: function (opts) {
     opts = opts || {}
     opts.ns = 'test'

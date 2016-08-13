@@ -4,7 +4,7 @@
   "description": "Aerospike based MQEmitter",
   "main": "mqemitter-aerospike.js",
   "scripts": {
-    "test": "standard && tape test.js"
+    "test": "standard && tape test.js | faucet"
   },
   "pre-commit": "test",
   "repository": {

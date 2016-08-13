@@ -113,15 +113,14 @@ function MQEmitterAerospike (opts) {
       }
 
       that._started = true
-      console.log('++++++++', obj)
-      oldEmit.call(that, obj.data, cb)
 
+      oldEmit.call(that, obj.data, cb)
+      that._streamedCount++
       var id = that._streamedCount.toString()
       if (that._waiting[id]) {
         nextTick(that._waiting[id])
         delete that._waiting[id]
       }
-      that._streamedCount++
     }
   }
   MQEmitter.call(this, opts)
@@ -145,7 +144,6 @@ MQEmitterAerospike.prototype.emit = function (obj, cb) {
       throw err
     }
   } else {
-    console.log('==============', this._lastId)
     this._db.put(key(this._opts.ns, this._opts.set, this._lastId), { recordId: this._lastId, data: obj }, function (error, key) {
       if (error && error.code !== status.AEROSPIKE_OK) {
         cb(error)
@@ -164,15 +162,15 @@ MQEmitterAerospike.prototype.emit = function (obj, cb) {
   return this
 }
 
-MQEmitterAerospike.prototype.close = function (cb) {
+MQEmitterAerospike.prototype.close = function (releaseEventLoop, cb) {
   cb = cb || noop
 
   if (this.closedServer) {
     return cb()
   }
 
-  if (!this._stream) {
-    this.status.once('stream', this.close.bind(this, cb))
+  if (!this.streamOnce) {
+    this.status.once('stream', this.close.bind(this, releaseEventLoop, cb))
     return
   }
 
@@ -183,7 +181,7 @@ MQEmitterAerospike.prototype.close = function (cb) {
       cb()
     } else {
       that.status.on('closedAck', function () {
-        that._db.close(false)
+        that._db.close(releaseEventLoop)
         that.closedServer = true
         if (cb) {
           cb()
