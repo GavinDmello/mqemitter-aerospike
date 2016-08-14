@@ -56,7 +56,6 @@ function MQEmitterAerospike (opts) {
   })
 
   var oldEmit = MQEmitter.prototype.emit
-  that._mutex = false
 
   this._waiting = {}
   this._streamedCount = 0
@@ -86,6 +85,8 @@ function MQEmitterAerospike (opts) {
       that._streamData[data.recordId] = data
       if (that._temp > that._lastId) {
         that._lastId = that._temp
+      } else if (that._temp < that._lastId) {
+        recordsLength = that._lastId
       }
       if (that.streamOnce === 0) {
         that._streamedCount = that._temp
