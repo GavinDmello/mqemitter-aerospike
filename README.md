@@ -12,6 +12,7 @@ Example
 ```js
 var aerospikedb = require('./mqemitter-aerospike')
 var mq = aerospikedb({
+	hosts:'localhost:3000'
     ns: 'test',
     set: 'demo'
 })
@@ -34,6 +35,8 @@ mq.emit(msg, function () {
 ```
 API
 ---------
+
+*  `mq = aerospikedb(opts)` - This is to instantiate the emitter. The opts provided include all the options which have to provided to instantiate an aerospike client and should also include the namespace and set name.
 
 *  `mq.close(releaseEventLoop, cb)` - The releasedEventLoop is a booleam which tells the Aerospike client to release the event loop after closing the connection. Ideally this should be made false if mqemitter-aerospike will not be instantiated again during the process lifetime.  Callback is optional.
 

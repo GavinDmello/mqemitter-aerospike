@@ -18,12 +18,7 @@ function MQEmitterAerospike (opts) {
   opts.ns = opts.ns || 'test'
 
   var config = {
-    hosts: opts.hosts,
-    connTimeoutMs: 3000,
-    policies: {
-      timeout: 10000
-    },
-    tenderInterval: 100
+    hosts: opts.hosts
   }
 
   this._opts = opts
