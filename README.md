@@ -3,7 +3,7 @@ mqemitter-aerospike&nbsp;&nbsp;[![Build Status](https://travis-ci.org/mcollina/m
 
 Aerospike powered [MQEmitter](http://github.com/mcollina/mqemitter).
 MQEmitter is a special event emitter based which  has support for mqtt wildcards like `topic/+ & topic/#`. This however works well for a single process.
- 
+
 MQEmitter Aerospike is a multi process emitter. You can easily have multiple processes interacting with each other using a pub/sub.
 MQEmitter Aerospike also has backpressure support in which it respects the processing abilty of the client and publishes the messages accordingly. Aerospike's Enterprise version also has cross data center replication so you easily transmit messages cross DC with some delay. 
 
@@ -12,11 +12,16 @@ You can the use this to transmit messages between two processes. It can also be 
 See [MQEmitter](http://github.com/mcollina/mqemitter) for the base
 API.
 
+
+Installation
+------------
+`npm i mqemitter-aerospike`
+
 Example
 -------
 
 ```js
-var aerospikedb = require('./mqemitter-aerospike')
+var aerospikedb = require('mqemitter-aerospike')
 var mq = aerospikedb({
 	hosts:'localhost:3000'
     ns: 'test',
