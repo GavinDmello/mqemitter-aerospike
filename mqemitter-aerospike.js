@@ -16,9 +16,13 @@ function MQEmitterAerospike (opts) {
   opts = opts || {}
   opts.set = opts.set || 'pubsub'
   opts.ns = opts.ns || 'test'
+  opts.policies = opts.policies || { timeout: 100 }
+  opts.tenderInterval = opts.tenderInterval || 1000
 
   var config = {
-    hosts: opts.hosts
+    hosts: opts.hosts,
+    policies: opts.policies,
+    tenderInterval: opts.tenderInterval
   }
 
   this._opts = opts
@@ -33,7 +37,8 @@ function MQEmitterAerospike (opts) {
   } else {
     aerospike.connect(config, function (error, client) {
       if (error) {
-        return
+        error = new Error('Cannot connect to Aerospike')
+        throw error
       } else {
         that._db = client
         start()
