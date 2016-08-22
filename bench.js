@@ -16,7 +16,7 @@
 'use strict'
 
 var mqemitter = require('./')
-var emitter = mqemitter({ concurrency: 10 })
+var emitter = mqemitter({ns:'test', set:'bench', concurrency: 10 })
 var total = 1000000
 var written = 0
 var received = 0

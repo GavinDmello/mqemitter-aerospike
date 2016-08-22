@@ -2,7 +2,9 @@
 
 var mqemitter = require('../')
 var instance = mqemitter({
-  url: 'mongodb://localhost/aaa'
+	hosts:'localhost:3000'
+    ns: 'test',
+    set: 'demo'
 })
 
 instance.on('hello', function (data, cb) {
