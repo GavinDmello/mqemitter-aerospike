@@ -23,7 +23,7 @@ Example
 ```js
 var aerospikedb = require('mqemitter-aerospike')
 var mq = aerospikedb({
-	hosts:'localhost:3000'
+	hosts:'localhost:3000',
     ns: 'test',
     set: 'demo'
 })

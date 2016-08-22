@@ -2,7 +2,7 @@
 
 var mqemitter = require('../')
 var instance = mqemitter({
-	hosts:'localhost:3000'
+	hosts:'localhost:3000',
     ns: 'test',
     set: 'demo'
 })
